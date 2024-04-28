@@ -7,98 +7,65 @@ Wrapper utilities for interaction with REST APIs using [Axios](https://axios-htt
 1. Install the package:
 
 ```
-@ronas-it/axios-api-client
+npm i @ronas-it/axios-api-client
 ```
 
-2. Set the defaults for your API in the root layout (`your-app/app/_layout.tsx` for example):
+2. Create API service instance:
 
 ```ts
-import 'reflect-metadata';
+import { ApiService } from '@ronas-it/axios-api-client';
+import { configuration } from './configuration';
 
-import { apiService } from '@ronas-it/axios-api-client';
-import { store } from '@your-app/mobile/shared/data-access/store';
-import { Stack } from 'expo-router';
-import { ReactElement } from 'react';
-import { Provider } from 'react-redux';
-
-export { ErrorBoundary } from 'expo-router';
-
-apiService.httpClient.defaults.baseURL = 'https://api.your-app.com';
-
-export default function RootLayout(): ReactElement | null {
-  return (
-    <Provider store={store}>
-      <Stack>
-        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-        <Stack.Screen name='(main)' options={{ headerShown: false }} />
-        {/* Your app screens */}
-      </Stack>
-    </Provider>
-  );
-}
+export const apiService = new ApiService(configuration.apiURL);
 ```
 
 ## Usage
 
-You can use this library to create your custom API:
-
 ```ts
-import { axiosBaseQuery, createAppApi } from '@ronas-it/axios-api-client';
-
-export const authApi = createAppApi({
-  reducerPath: 'auth',
-  baseQuery: axiosBaseQuery,
-  endpoints: (builder) => ({
-    // Add your endpoints here
-  })
-});
-```
-
-Use `onResponseSessionExpiryRefreshInterceptor` and `onRequestSessionExpiryRefreshInterceptor` to add token refreshing flow to your app:
-
-```ts
-import { createListenerMiddleware } from '@reduxjs/toolkit';
 import {
-  apiService,
+  ApiService,
+  AuthConfiguration,
   SessionExpiryRefreshInterceptorArgs,
   onResponseSessionExpiryRefreshInterceptor,
   onRequestSessionExpiryRefreshInterceptor
 } from '@ronas-it/axios-api-client';
-import { authApi } from '@your-app/mobile/shared/data-access/api';
-import { configuration } from '@your-app/mobile/shared/data-access/api-client';
-import { authActions, authSelectors } from './slice';
-import type { AppState } from '@your-app/mobile/shared/data-access/store';
 
-export const authListenerMiddleware = createListenerMiddleware<AppState>();
-
-authListenerMiddleware.startListening({
-  matcher: authApi.internalActions.middlewareRegistered.match,
-  effect: async (_, { dispatch, getState }) => {
-    const options: SessionExpiryRefreshInterceptorArgs = {
-      configuration: configuration.auth,
-      getIsAuthenticated: () => authSelectors.isAuthenticated(getState()),
-      getSessionExpiry: () => authSelectors.tokenExpires(getState()),
-      runTokenRefreshRequest: async () => {
-        const { token, ttl } = await dispatch(authApi.endpoints.refreshToken.initiate()).unwrap();
-        dispatch(authActions.saveToken({ token, ttl }));
-
-        return token;
-      },
-      onError: () => {
-        return dispatch(authApi.endpoints.logout.initiate()).unwrap();
-      }
-    };
-
-    apiService.useInterceptors({
-      request: [[onRequestSessionExpiryRefreshInterceptor(options)]],
-      response: [[null, onResponseSessionExpiryRefreshInterceptor(options)]]
-    });
+const configuration: AuthConfiguration = {
+  apiURL: 'https://api.your-app.dev',
+  auth: {
+    refreshTokenRoute: '/auth/refresh',
+    unauthorizedRoutes: ['/auth/forgot-password', '/auth/restore-password'],
+    logoutRoute: '/logout'
   }
+};
+
+const apiService = new ApiService(configuration.apiURL);
+
+const options: SessionExpiryRefreshInterceptorArgs = {
+  configuration: configuration.auth,
+  getIsAuthenticated: () => {
+    /* get isAuthenticated state here */
+  },
+  runTokenRefreshRequest: async () => {
+    const { token, ttl } = await apiService.get('/refresh');
+    dispatch(authActions.saveToken({ token, ttl }));
+
+    return token;
+  },
+  onError: () => apiService.post('/logout')
+};
+
+apiService.useInterceptors({
+  request: [[onRequestSessionExpiryRefreshInterceptor(options)]],
+  response: [
+    [null, onResponseSessionExpiryRefreshInterceptor(options)],
+    [
+      null,
+      unauthorizedInterceptor({
+        publicEndpoints: configuration.auth.unauthorizedRoutes,
+        onError: () => apiService.post('/logout')
+      })
+    ]
+  ]
 });
 ```
-
-## TODOs
-
-1. Extend Readme
-2. Add code documentation and examples
-3. Remove `@reduxjs/toolkit` and `@ronas-it/rtkq-entity-api` from devDependencies
