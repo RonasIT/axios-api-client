@@ -3,7 +3,6 @@
     "outDir": "dist",
     "allowJs": true,
     "esModuleInterop": true,
-    "jsx": "react-native",
     "lib": ["DOM", "ESNext"],
     "moduleResolution": "node",
     "noEmit": true,

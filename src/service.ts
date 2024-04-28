@@ -113,5 +113,3 @@ export class ApiService {
     return apiCall;
   }
 }
-
-export const apiService = new ApiService();

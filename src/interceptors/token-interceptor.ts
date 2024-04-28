@@ -1,5 +1,8 @@
 import { InternalAxiosRequestConfig } from 'axios';
-import { TokenInterceptorOptions } from '../interfaces';
+
+export interface TokenInterceptorOptions {
+  getToken: () => string;
+}
 
 export const tokenInterceptor =
   ({ getToken }: TokenInterceptorOptions) =>

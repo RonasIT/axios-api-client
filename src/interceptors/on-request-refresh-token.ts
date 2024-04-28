@@ -1,25 +1,21 @@
 import { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { DateTime } from 'luxon';
-import { SessionExpiryRefreshInterceptorArgs } from '../interfaces';
+import { decode } from 'base-64';
+import { SessionExpiryRefreshInterceptorArgs } from '../types';
+import { checkIsTokenExpired } from '../utils';
+
+global.atob = decode;
 
 let refreshTokenRequest: Promise<string> | null;
 
 export const onRequestSessionExpiryRefreshInterceptor =
-  ({
-    configuration,
-    getIsAuthenticated,
-    getSessionExpiry,
-    runTokenRefreshRequest,
-    onError
-  }: SessionExpiryRefreshInterceptorArgs) =>
+  ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: SessionExpiryRefreshInterceptorArgs) =>
   async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     const isAuthenticated = getIsAuthenticated();
-    // TODO: Fix sessionExpiry is retrieved before its set in authListenerMiddleware
-    const sessionExpiry = getSessionExpiry();
+    const isTokenExpired = checkIsTokenExpired((config.headers.Authorization as string)?.split(' ')[1]);
 
     if (
       isAuthenticated &&
-      (!sessionExpiry?.isValid || sessionExpiry < DateTime.local()) &&
+      isTokenExpired &&
       ![...configuration.unauthorizedRoutes, configuration.refreshTokenRoute, configuration.logoutRoute].includes(
         config.url ?? ''
       )

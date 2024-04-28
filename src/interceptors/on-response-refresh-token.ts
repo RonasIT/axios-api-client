@@ -1,6 +1,5 @@
-import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { StatusCodes } from 'http-status-codes';
-import { SessionExpiryRefreshInterceptorArgs } from '../interfaces';
+import axios, { AxiosError, InternalAxiosRequestConfig, HttpStatusCode } from 'axios';
+import { SessionExpiryRefreshInterceptorArgs } from '../types';
 
 let refreshTokenRequest: Promise<string> | null;
 
@@ -8,7 +7,7 @@ export const onResponseSessionExpiryRefreshInterceptor =
   ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: SessionExpiryRefreshInterceptorArgs) =>
   async (error: AxiosError<{ error?: string }>): Promise<unknown> => {
     if (
-      error.response?.status === StatusCodes.UNAUTHORIZED &&
+      error.response?.status === HttpStatusCode.Unauthorized &&
       getIsAuthenticated() &&
       error.response?.config?.url &&
       ![...configuration.unauthorizedRoutes, configuration.refreshTokenRoute, configuration.logoutRoute].includes(

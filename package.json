@@ -20,9 +20,6 @@
     "url": "git+https://github.com/RonasIT/axios-api-client.git"
   },
   "keywords": [
-    "react",
-    "rtkq",
-    "redux-toolkit",
     "query",
     "api",
     "typescript",
@@ -36,7 +33,6 @@
   "homepage": "https://github.com/RonasIT/axios-api-client#readme",
   "devDependencies": {
     "@types/lodash": "^4.14.202",
-    "@types/luxon": "^3.4.2",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
@@ -45,7 +41,6 @@
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-promise": "^6.1.1",
-    "eslint-plugin-react": "^7.34.0",
     "eslint-plugin-unused-imports": "^3.1.0",
     "husky": "^9.0.11",
     "lint-staged": "^15.2.2",
@@ -55,15 +50,16 @@
     "typescript": "^5.4.2"
   },
   "peerDependencies": {
-    "@reduxjs/toolkit": "^2.2.1",
-    "@ronas-it/rtkq-entity-api": "^0.2.3",
     "axios": "^1.6.7",
-    "http-status-codes": "^2.3.0",
-    "lodash": "^4.17.21",
-    "luxon": "^3.4.4"
+    "lodash": "^4.17.21"
   },
   "lint-staged": {
     "*.js": "eslint --cache --fix",
     "*.{js,css,md}": "prettier --write"
+  },
+  "dependencies": {
+    "@types/base-64": "^1.0.2",
+    "base-64": "^1.0.0",
+    "jwt-decode": "^4.0.0"
   }
 }
