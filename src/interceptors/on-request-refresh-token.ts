@@ -11,7 +11,9 @@ export const onRequestSessionExpiryRefreshInterceptor =
   ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: SessionExpiryRefreshInterceptorArgs) =>
   async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     const isAuthenticated = getIsAuthenticated();
-    const isTokenExpired = checkIsTokenExpired((config.headers.Authorization as string)?.split(' ')[1]);
+    const isTokenExpired =
+      typeof config.headers.Authorization === 'string' &&
+      checkIsTokenExpired(config.headers.Authorization?.split(' ')[1]);
 
     if (
       isAuthenticated &&
