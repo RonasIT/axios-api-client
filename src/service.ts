@@ -2,27 +2,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, {
   Axios,
-  AxiosDefaults,
   AxiosError,
-  AxiosHeaderValue,
   AxiosInstance,
   AxiosInterceptorManager,
   AxiosRequestConfig,
   AxiosResponse,
-  HeadersDefaults,
   InternalAxiosRequestConfig,
   Method
 } from 'axios';
 import { formDataContentTypeInterceptor, formDataInterceptor } from './interceptors/form-data';
 import { ApiCall } from './types';
-
-export type UpdatedAxiosDefaults = Partial<
-  Omit<AxiosDefaults, 'headers'> & {
-    headers: HeadersDefaults & {
-      [key: string]: AxiosHeaderValue;
-    };
-  }
->;
 
 export class ApiService {
   public readonly post: ApiCall;

@@ -1,7 +1,7 @@
 import { AxiosError } from 'axios';
 import { AuthConfiguration } from './auth-configuration';
 
-export type SessionExpiryRefreshInterceptorArgs = {
+export type RefreshTokenOptions = {
   configuration: AuthConfiguration;
   getIsAuthenticated: () => boolean | null;
   runTokenRefreshRequest: () => Promise<string>;

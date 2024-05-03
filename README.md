@@ -25,9 +25,9 @@ export const apiService = new ApiService(configuration.apiURL);
 import {
   ApiService,
   AuthConfiguration,
-  SessionExpiryRefreshInterceptorArgs,
-  onResponseSessionExpiryRefreshInterceptor,
-  onRequestSessionExpiryRefreshInterceptor
+  RefreshTokenOptions,
+  onResponseRefreshToken,
+  onRequestRefreshToken,
 } from '@ronas-it/axios-api-client';
 
 const configuration: AuthConfiguration = {
@@ -35,37 +35,37 @@ const configuration: AuthConfiguration = {
   auth: {
     refreshTokenRoute: '/auth/refresh',
     unauthorizedRoutes: ['/auth/forgot-password', '/auth/restore-password'],
-    logoutRoute: '/logout'
-  }
+    logoutRoute: '/logout',
+  },
 };
 
 const apiService = new ApiService(configuration.apiURL);
 
-const options: SessionExpiryRefreshInterceptorArgs = {
+const options: RefreshTokenOptions = {
   configuration: configuration.auth,
   getIsAuthenticated: () => {
     /* get isAuthenticated state here */
   },
   runTokenRefreshRequest: async () => {
     const { token, ttl } = await apiService.get('/refresh');
-    dispatch(authActions.saveToken({ token, ttl }));
+    /* do something with token and ttl */
 
     return token;
   },
-  onError: () => apiService.post('/logout')
+  onError: () => apiService.post('/logout'),
 };
 
 apiService.useInterceptors({
-  request: [[onRequestSessionExpiryRefreshInterceptor(options)]],
+  request: [[onRequestRefreshToken(options)]],
   response: [
-    [null, onResponseSessionExpiryRefreshInterceptor(options)],
+    [null, onResponseRefreshToken(options)],
     [
       null,
       unauthorizedInterceptor({
         publicEndpoints: configuration.auth.unauthorizedRoutes,
-        onError: () => apiService.post('/logout')
-      })
-    ]
-  ]
+        onError: () => apiService.post('/logout'),
+      }),
+    ],
+  ],
 });
 ```

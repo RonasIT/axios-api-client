@@ -1,14 +1,11 @@
 import { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { decode } from 'base-64';
-import { SessionExpiryRefreshInterceptorArgs } from '../types';
+import { RefreshTokenOptions } from '../types';
 import { checkIsTokenExpired } from '../utils';
-
-global.atob = decode;
 
 let refreshTokenRequest: Promise<string> | null;
 
-export const onRequestSessionExpiryRefreshInterceptor =
-  ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: SessionExpiryRefreshInterceptorArgs) =>
+export const onRequestRefreshToken =
+  ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: RefreshTokenOptions) =>
   async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     const isAuthenticated = getIsAuthenticated();
     const isTokenExpired =
