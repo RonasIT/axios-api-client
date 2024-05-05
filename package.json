@@ -10,8 +10,8 @@
   ],
   "scripts": {
     "build": "tsup-node",
-    "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix",
-    "format": "prettier --write .",
+    "lint": "npx tsc && npx eslint ./",
+    "format": "npx prettier --write . && npm run lint -- --fix",
     "prepare": "husky install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -54,8 +54,8 @@
     "lodash": "^4.17.21"
   },
   "lint-staged": {
-    "*.js": "eslint --cache --fix",
-    "*.{js,css,md}": "prettier --write"
+    "*.{js,ts}": "eslint --cache --fix",
+    "*.{js,ts,css,md}": "prettier --write"
   },
   "dependencies": {
     "@types/base-64": "^1.0.2",

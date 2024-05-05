@@ -1,12 +1,11 @@
 import { AxiosError, InternalAxiosRequestConfig } from 'axios';
-import { RefreshTokenOptions } from '../types';
+import { RefreshTokenInterceptorOptions } from '../types';
 import { checkIsTokenExpired } from '../utils';
 
 let refreshTokenRequest: Promise<string> | null;
 
-export const onRequestRefreshToken =
-  ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: RefreshTokenOptions) =>
-  async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+export const onRequestRefreshTokenInterceptor =
+  ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: RefreshTokenInterceptorOptions) => async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     const isAuthenticated = getIsAuthenticated();
     const isTokenExpired =
       typeof config.headers.Authorization === 'string' &&
@@ -16,7 +15,7 @@ export const onRequestRefreshToken =
       isAuthenticated &&
       isTokenExpired &&
       ![...configuration.unauthorizedRoutes, configuration.refreshTokenRoute, configuration.logoutRoute].includes(
-        config.url ?? ''
+        config.url ?? '',
       )
     ) {
       if (!refreshTokenRequest) {

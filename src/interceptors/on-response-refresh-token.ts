@@ -1,17 +1,16 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, HttpStatusCode } from 'axios';
-import { RefreshTokenOptions } from '../types';
+import { RefreshTokenInterceptorOptions } from '../types';
 
 let refreshTokenRequest: Promise<string> | null;
 
-export const onResponseRefreshToken =
-  ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: RefreshTokenOptions) =>
-  async (error: AxiosError<{ error?: string }>): Promise<unknown> => {
+export const onResponseRefreshTokenInterceptor =
+  ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: RefreshTokenInterceptorOptions) => async (error: AxiosError<{ error?: string }>): Promise<unknown> => {
     if (
       error.response?.status === HttpStatusCode.Unauthorized &&
       getIsAuthenticated() &&
       error.response?.config?.url &&
       ![...configuration.unauthorizedRoutes, configuration.refreshTokenRoute, configuration.logoutRoute].includes(
-        error.response.config.url
+        error.response.config.url,
       )
     ) {
       if (!refreshTokenRequest) {

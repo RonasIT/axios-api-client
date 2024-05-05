@@ -25,9 +25,9 @@ export const apiService = new ApiService(configuration.apiURL);
 import {
   ApiService,
   AuthConfiguration,
-  RefreshTokenOptions,
-  onResponseRefreshToken,
-  onRequestRefreshToken,
+  RefreshTokenInterceptorOptions,
+  onResponseRefreshTokenInterceptor,
+  onRequestRefreshTokenInterceptor,
 } from '@ronas-it/axios-api-client';
 
 const configuration: AuthConfiguration = {

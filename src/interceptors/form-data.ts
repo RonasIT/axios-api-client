@@ -1,8 +1,7 @@
 import { InternalAxiosRequestConfig, RawAxiosRequestHeaders } from 'axios';
-import { forOwn, some, values } from 'lodash';
 
 export const formDataInterceptor = (request: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-  const hasFiles = some(values(request.data), (value) => value instanceof File);
+  const hasFiles = Object.values(request.data).some((value) => value instanceof File);
 
   if (hasFiles && request.method && ['post', 'put'].includes(request.method)) {
     const formData = convertToFormData(request.data);
@@ -16,7 +15,7 @@ export const formDataInterceptor = (request: InternalAxiosRequestConfig): Intern
 const convertToFormData = (data: object): FormData => {
   const formData = new FormData();
 
-  forOwn(data, (objectValue: unknown, objectKey) => {
+  Object.entries(data).forEach(([objectKey, objectValue]) => {
     if (objectValue instanceof File) {
       formData.append(objectKey, objectValue, objectValue.name);
     } else if (typeof objectValue !== 'undefined') {
@@ -28,8 +27,7 @@ const convertToFormData = (data: object): FormData => {
 };
 
 export const formDataContentTypeInterceptor =
-  () =>
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
+  () => (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     if (config.data instanceof FormData && config.headers) {
       (config?.headers as RawAxiosRequestHeaders)['Content-Type'] = 'multipart/form-data';
     }
