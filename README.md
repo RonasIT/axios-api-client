@@ -26,6 +26,7 @@ import {
   ApiService,
   AuthConfiguration,
   RefreshTokenInterceptorOptions,
+  tokenInterceptor,
   onResponseRefreshTokenInterceptor,
   onRequestRefreshTokenInterceptor,
 } from '@ronas-it/axios-api-client';
@@ -54,6 +55,18 @@ const options: RefreshTokenOptions = {
   },
   onError: () => apiService.post('/logout'),
 };
+
+apiService.useInterceptors({
+  request: [
+    [
+      tokenInterceptor({
+        getToken: () => {
+          /* get token here */
+        },
+      }),
+    ],
+  ],
+});
 
 apiService.useInterceptors({
   request: [[onRequestRefreshToken(options)]],
