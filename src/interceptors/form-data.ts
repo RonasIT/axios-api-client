@@ -1,7 +1,7 @@
 import { InternalAxiosRequestConfig, RawAxiosRequestHeaders } from 'axios';
 
 export const formDataInterceptor = (request: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-  const hasFiles = Object.values(request.data).some((value) => value instanceof File);
+  const hasFiles = Object.values(request.data ?? {}).some((value) => value instanceof File);
 
   if (hasFiles && request.method && ['post', 'put'].includes(request.method)) {
     const formData = convertToFormData(request.data);

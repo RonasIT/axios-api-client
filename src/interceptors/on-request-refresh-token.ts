@@ -7,9 +7,10 @@ let refreshTokenRequest: Promise<string> | null;
 export const onRequestRefreshTokenInterceptor =
   ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: RefreshTokenInterceptorOptions) => async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     const isAuthenticated = getIsAuthenticated();
+
     const isTokenExpired =
       typeof config.headers.Authorization === 'string' &&
-      checkIsTokenExpired(config.headers.Authorization?.split(' ')[1]);
+      checkIsTokenExpired(config.headers.Authorization.split(' ')[1]);
 
     if (
       isAuthenticated &&
