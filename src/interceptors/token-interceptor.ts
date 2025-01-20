@@ -5,8 +5,7 @@ export interface TokenInterceptorOptions {
 }
 
 export const tokenInterceptor =
-  ({ getToken }: TokenInterceptorOptions) =>
-  async (request: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+  ({ getToken }: TokenInterceptorOptions) => async (request: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
     const token = getToken();
 
     if (request.headers && token) {
