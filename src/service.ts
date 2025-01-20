@@ -1,5 +1,3 @@
-// NOTE: Rule below is disabled to match Axios typings
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, {
   Axios,
   AxiosError,
@@ -8,7 +6,7 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
-  Method
+  Method,
 } from 'axios';
 import { formDataContentTypeInterceptor, formDataInterceptor } from './interceptors/form-data';
 import { ApiCall } from './types';
@@ -30,7 +28,7 @@ export class ApiService {
     const config: AxiosRequestConfig = {
       baseURL,
       withCredentials: true,
-      ...baseConfig
+      ...baseConfig,
     };
 
     this.httpClient = axios.create(config);
@@ -42,7 +40,7 @@ export class ApiService {
     this.delete = this.request('delete');
 
     this.useInterceptors({
-      request: [[formDataContentTypeInterceptor()]]
+      request: [[formDataContentTypeInterceptor()]],
     });
 
     if (typeof window !== 'undefined') {
@@ -75,17 +73,18 @@ export class ApiService {
     async function apiCall<T = any>(
       endpoint: string,
       data?: any,
-      options?: AxiosRequestConfig & { fullResponse?: false }
+      options?: AxiosRequestConfig & { fullResponse?: false },
     ): Promise<T>;
     async function apiCall<T = any>(
       endpoint: string,
       data?: any,
-      options?: AxiosRequestConfig & { fullResponse: true }
+      options?: AxiosRequestConfig & { fullResponse: true },
     ): Promise<AxiosResponse<T>>;
+
     async function apiCall<T = any>(
       endpoint: string,
       data?: any,
-      options?: AxiosRequestConfig & { fullResponse?: boolean }
+      options?: AxiosRequestConfig & { fullResponse?: boolean },
     ): Promise<T | AxiosResponse<T>> {
       const payload = ['get', 'delete'].includes(method) ? { params: data } : { data };
 
@@ -93,7 +92,7 @@ export class ApiService {
         method,
         url: endpoint,
         ...options,
-        ...payload
+        ...payload,
       });
 
       return options?.fullResponse ? result : result.data;
