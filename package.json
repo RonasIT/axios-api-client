@@ -1,6 +1,6 @@
 {
   "name": "@ronas-it/axios-api-client",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Wrapper utilities for interaction with REST APIs using Axios",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
