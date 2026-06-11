@@ -4,6 +4,12 @@ import { checkIsTokenExpired } from '../utils';
 
 let refreshTokenRequest: Promise<string> | null;
 
+/**
+ * Creates a request interceptor that refreshes access token before sending protected requests.
+ *
+ * @param {RefreshTokenRequestInterceptorOptions} options - Refresh token flow options.
+ * @returns {(config: InternalAxiosRequestConfig) => Promise<InternalAxiosRequestConfig>} Axios request interceptor.
+ */
 export const onRequestRefreshTokenInterceptor =
   ({
     configuration,

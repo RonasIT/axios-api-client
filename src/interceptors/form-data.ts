@@ -1,5 +1,11 @@
 import { InternalAxiosRequestConfig, RawAxiosRequestHeaders } from 'axios';
 
+/**
+ * Converts request payload to `FormData` when payload contains `File` values.
+ *
+ * @param {InternalAxiosRequestConfig} request - Axios request config.
+ * @returns {InternalAxiosRequestConfig} Updated request config.
+ */
 export const formDataInterceptor = (request: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
   const hasFiles = Object.values(request.data ?? {}).some((value) => value instanceof File);
 
@@ -26,6 +32,11 @@ const convertToFormData = (data: object): FormData => {
   return formData;
 };
 
+/**
+ * Creates request interceptor that sets `Content-Type` for `FormData` payloads.
+ *
+ * @returns {(config: InternalAxiosRequestConfig) => InternalAxiosRequestConfig} Axios request interceptor.
+ */
 export const formDataContentTypeInterceptor =
   () => (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
     if (config.data instanceof FormData && config.headers) {

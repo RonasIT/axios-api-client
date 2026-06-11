@@ -3,6 +3,12 @@ import { RefreshTokenInterceptorOptions } from '../types';
 
 let refreshTokenRequest: Promise<string> | null;
 
+/**
+ * Creates a response error interceptor that retries unauthorized requests after token refresh.
+ *
+ * @param {RefreshTokenInterceptorOptions} options - Refresh token flow options.
+ * @returns {(error: AxiosError<{ error?: string }>) => Promise<unknown>} Axios response error interceptor.
+ */
 export const onResponseRefreshTokenInterceptor =
   ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: RefreshTokenInterceptorOptions) => async (error: AxiosError<{ error?: string }>): Promise<unknown> => {
     if (

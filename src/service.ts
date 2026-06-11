@@ -11,6 +11,9 @@ import axios, {
 import { formDataContentTypeInterceptor, formDataInterceptor } from './interceptors/form-data';
 import { ApiCall } from './types';
 
+/**
+ * Axios-based HTTP service with typed request shortcuts and interceptor helpers.
+ */
 export class ApiService {
   public readonly post: ApiCall;
 
@@ -24,6 +27,12 @@ export class ApiService {
 
   public readonly httpClient: AxiosInstance;
 
+  /**
+   * Creates a new API service instance.
+   *
+   * @param {string | undefined} baseURL - Base URL for all requests.
+   * @param {AxiosRequestConfig | undefined} baseConfig - Additional axios config merged into the client config.
+   */
   constructor(baseURL?: string, baseConfig?: AxiosRequestConfig) {
     const config: AxiosRequestConfig = {
       baseURL,
@@ -48,10 +57,24 @@ export class ApiService {
     }
   }
 
+  /**
+   * Checks whether an unknown error is an axios error.
+   *
+   * @template T
+   * @param {AxiosError | any} error - Error candidate.
+   * @returns {error is AxiosError<T>} `true` when error matches axios error shape.
+   */
   public static isAxiosError<T>(error: AxiosError | any): error is AxiosError<T> {
     return error && error.isAxiosError;
   }
 
+  /**
+   * Registers request and response interceptors on the current axios client.
+   *
+   * @param {Object} interceptors - Interceptor tuples accepted by axios `use` methods.
+   * @param {Array<Parameters<AxiosInterceptorManager<InternalAxiosRequestConfig>['use']>>} [interceptors.request] - Request interceptors.
+   * @param {Array<Parameters<AxiosInterceptorManager<AxiosResponse>['use']>>} [interceptors.response] - Response interceptors.
+   */
   public useInterceptors(interceptors: {
     request?: Array<Parameters<AxiosInterceptorManager<InternalAxiosRequestConfig>['use']>>;
     response?: Array<Parameters<AxiosInterceptorManager<AxiosResponse>['use']>>;
