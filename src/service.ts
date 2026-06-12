@@ -71,9 +71,11 @@ export class ApiService {
   /**
    * Registers request and response interceptors on the current axios client.
    *
-   * @param {Object} interceptors - Interceptor tuples accepted by axios `use` methods.
-   * @param {Array<Parameters<AxiosInterceptorManager<InternalAxiosRequestConfig>['use']>>} [interceptors.request] - Request interceptors.
-   * @param {Array<Parameters<AxiosInterceptorManager<AxiosResponse>['use']>>} [interceptors.response] - Response interceptors.
+   * @param {Object} interceptors - Interceptor configuration object:
+   *   - request: Array of [onFulfilled, onRejected] callback pairs for request interceptors
+   *   - response: Array of [onFulfilled, onRejected] callback pairs for response interceptors
+   * @param {Array<Parameters<AxiosInterceptorManager<InternalAxiosRequestConfig>['use']>>} [interceptors.request] - Request interceptor tuples.
+   * @param {Array<Parameters<AxiosInterceptorManager<AxiosResponse>['use']>>} [interceptors.response] - Response interceptor tuples.
    */
   public useInterceptors(interceptors: {
     request?: Array<Parameters<AxiosInterceptorManager<InternalAxiosRequestConfig>['use']>>;
