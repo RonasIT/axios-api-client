@@ -4,31 +4,53 @@ import { checkIsTokenExpired } from '../utils';
 
 let refreshTokenRequest: Promise<string> | null;
 
+/**
+ * Creates a request interceptor that refreshes access token before sending protected requests.
+ *
+ * @param options - {@link RefreshTokenInterceptorOptions}
+ * @returns Axios request interceptor.
+ *
+ * @example
+ * const options: RefreshTokenInterceptorOptions = {
+ *   configuration: configuration.auth,
+ *   getIsAuthenticated: () => authSelectors.isAuthenticated(getState()),
+ *   runTokenRefreshRequest: async () => {
+ *     const { token } = await dispatch(authApi.endpoints.refreshToken.initiate()).unwrap();
+ *     appStorageService.token.set(token);
+ *
+ *     return token;
+ *   },
+ *   onError: () => {
+ *     return dispatch(authApi.endpoints.logout.initiate()).unwrap();
+ *   },
+ * };
+ *
+ * apiService.useInterceptors({
+ *   request: [[onRequestRefreshTokenInterceptor(options)]],
+ *   response: [[null, onResponseRefreshTokenInterceptor(options)]],
+ * });
+ */
 export const onRequestRefreshTokenInterceptor =
-  ({
-    configuration,
-    getIsAuthenticated,
-    getIsTokenExpired,
-    runTokenRefreshRequest,
-    onError,
-  }: RefreshTokenInterceptorOptions) => async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
-    const isAuthenticated = getIsAuthenticated();
+  (options: RefreshTokenInterceptorOptions) => async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+    const isAuthenticated = options.getIsAuthenticated();
 
-    const isTokenExpired = getIsTokenExpired
-      ? getIsTokenExpired()
+    const isTokenExpired = options.getIsTokenExpired
+      ? options.getIsTokenExpired()
       : typeof config.headers.Authorization === 'string' &&
         checkIsTokenExpired(config.headers.Authorization.split(' ')[1]);
 
     if (
       isAuthenticated &&
       isTokenExpired &&
-      ![...configuration.unauthorizedRoutes, configuration.refreshTokenRoute, configuration.logoutRoute].includes(
-        config.url ?? '',
-      )
+      ![
+        ...options.configuration.unauthorizedRoutes,
+        options.configuration.refreshTokenRoute,
+        options.configuration.logoutRoute,
+      ].includes(config.url ?? '')
     ) {
       if (!refreshTokenRequest) {
         try {
-          refreshTokenRequest = runTokenRefreshRequest();
+          refreshTokenRequest = options.runTokenRefreshRequest();
           const token = await refreshTokenRequest;
 
           refreshTokenRequest = null;
@@ -40,7 +62,7 @@ export const onRequestRefreshTokenInterceptor =
           return config;
         } catch (error) {
           refreshTokenRequest = null;
-          await onError(error as AxiosError<{ error?: string | undefined }>);
+          await options.onError(error as AxiosError<{ error?: string | undefined }>);
 
           throw error;
         }

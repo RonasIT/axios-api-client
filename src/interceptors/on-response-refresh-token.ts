@@ -3,6 +3,32 @@ import { RefreshTokenInterceptorOptions } from '../types';
 
 let refreshTokenRequest: Promise<string> | null;
 
+/**
+ * Creates a response error interceptor that retries unauthorized requests after token refresh.
+ *
+ * @param options - {@link RefreshTokenInterceptorOptions}
+ * @returns Axios response error interceptor.
+ *
+ * @example
+ * const options: RefreshTokenInterceptorOptions = {
+ *   configuration: configuration.auth,
+ *   getIsAuthenticated: () => authSelectors.isAuthenticated(getState()),
+ *   runTokenRefreshRequest: async () => {
+ *     const { token } = await dispatch(authApi.endpoints.refreshToken.initiate()).unwrap();
+ *     appStorageService.token.set(token);
+ *
+ *     return token;
+ *   },
+ *   onError: () => {
+ *     return dispatch(authApi.endpoints.logout.initiate()).unwrap();
+ *   },
+ * };
+ *
+ * apiService.useInterceptors({
+ *   request: [[onRequestRefreshTokenInterceptor(options)]],
+ *   response: [[null, onResponseRefreshTokenInterceptor(options)]],
+ * });
+ */
 export const onResponseRefreshTokenInterceptor =
   ({ configuration, getIsAuthenticated, runTokenRefreshRequest, onError }: RefreshTokenInterceptorOptions) => async (error: AxiosError<{ error?: string }>): Promise<unknown> => {
     if (
