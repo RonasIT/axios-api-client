@@ -1,7 +1,7 @@
 import { InternalAxiosRequestConfig } from 'axios';
 
 export interface TokenInterceptorOptions {
-  getToken: () => string;
+  getToken: () => string | Promise<string>;
 }
 
 /**
@@ -22,7 +22,7 @@ export interface TokenInterceptorOptions {
  */
 export const tokenInterceptor =
   ({ getToken }: TokenInterceptorOptions) => async (request: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
-    const token = getToken();
+    const token = await getToken();
 
     if (request.headers && token) {
       request.headers.Authorization = `Bearer ${token}`;
