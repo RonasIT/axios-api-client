@@ -1,15 +1,15 @@
 import { InternalAxiosRequestConfig } from 'axios';
 
 export interface TokenInterceptorOptions {
+  /** Callback that returns the current access token string. */
   getToken: () => string | Promise<string>;
 }
 
 /**
  * Creates a request interceptor that sets `Authorization: Bearer <token>` header.
  *
- * @param {TokenInterceptorOptions} options - Configuration object:
- *   - getToken: Callback that returns current access token string
- * @returns {(request: InternalAxiosRequestConfig) => Promise<InternalAxiosRequestConfig>} Axios request interceptor.
+ * @param options - {@link TokenInterceptorOptions}
+ * @returns Axios request interceptor.
  *
  * @example
  * apiService.useInterceptors({

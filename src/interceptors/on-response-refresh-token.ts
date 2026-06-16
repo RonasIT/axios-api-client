@@ -6,12 +6,8 @@ let refreshTokenRequest: Promise<string> | null;
 /**
  * Creates a response error interceptor that retries unauthorized requests after token refresh.
  *
- * @param {RefreshTokenInterceptorOptions} options - Configuration object:
- *   - configuration: AuthConfiguration with refresh token route and routes to skip
- *   - getIsAuthenticated: Returns boolean | null for current auth state
- *   - runTokenRefreshRequest: Async function that performs token refresh and returns new token
- *   - onError: Error handler called when refresh fails
- * @returns {(error: AxiosError<{ error?: string }>) => Promise<unknown>} Axios response error interceptor.
+ * @param options - {@link RefreshTokenInterceptorOptions}
+ * @returns Axios response error interceptor.
  *
  * @example
  * const options: RefreshTokenInterceptorOptions = {

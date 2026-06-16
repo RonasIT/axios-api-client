@@ -7,13 +7,8 @@ let refreshTokenRequest: Promise<string> | null;
 /**
  * Creates a request interceptor that refreshes access token before sending protected requests.
  *
- * @param {RefreshTokenInterceptorOptions} options - Configuration object:
- *   - configuration: AuthConfiguration with refresh token route and routes to skip
- *   - getIsAuthenticated: Returns boolean | null for current auth state
- *   - getIsTokenExpired: Optional callback to check if token expired. If not provided, extracted from Authorization header
- *   - runTokenRefreshRequest: Async function that performs token refresh and returns new token
- *   - onError: Error handler called when refresh fails
- * @returns {(config: InternalAxiosRequestConfig) => Promise<InternalAxiosRequestConfig>} Axios request interceptor.
+ * @param options - {@link RefreshTokenInterceptorOptions}
+ * @returns Axios request interceptor.
  *
  * @example
  * const options: RefreshTokenInterceptorOptions = {
@@ -36,30 +31,26 @@ let refreshTokenRequest: Promise<string> | null;
  * });
  */
 export const onRequestRefreshTokenInterceptor =
-  ({
-    configuration,
-    getIsAuthenticated,
-    getIsTokenExpired,
-    runTokenRefreshRequest,
-    onError,
-  }: RefreshTokenInterceptorOptions) => async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
-    const isAuthenticated = getIsAuthenticated();
+  (options: RefreshTokenInterceptorOptions) => async (config: InternalAxiosRequestConfig): Promise<InternalAxiosRequestConfig> => {
+    const isAuthenticated = options.getIsAuthenticated();
 
-    const isTokenExpired = getIsTokenExpired
-      ? getIsTokenExpired()
+    const isTokenExpired = options.getIsTokenExpired
+      ? options.getIsTokenExpired()
       : typeof config.headers.Authorization === 'string' &&
         checkIsTokenExpired(config.headers.Authorization.split(' ')[1]);
 
     if (
       isAuthenticated &&
       isTokenExpired &&
-      ![...configuration.unauthorizedRoutes, configuration.refreshTokenRoute, configuration.logoutRoute].includes(
-        config.url ?? '',
-      )
+      ![
+        ...options.configuration.unauthorizedRoutes,
+        options.configuration.refreshTokenRoute,
+        options.configuration.logoutRoute,
+      ].includes(config.url ?? '')
     ) {
       if (!refreshTokenRequest) {
         try {
-          refreshTokenRequest = runTokenRefreshRequest();
+          refreshTokenRequest = options.runTokenRefreshRequest();
           const token = await refreshTokenRequest;
 
           refreshTokenRequest = null;
@@ -71,7 +62,7 @@ export const onRequestRefreshTokenInterceptor =
           return config;
         } catch (error) {
           refreshTokenRequest = null;
-          await onError(error as AxiosError<{ error?: string | undefined }>);
+          await options.onError(error as AxiosError<{ error?: string | undefined }>);
 
           throw error;
         }
