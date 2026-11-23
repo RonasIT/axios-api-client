@@ -37,6 +37,7 @@
     "@eslint/js": "^9.39.4",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@types/base-64": "^1.0.2",
+    "@types/node": "^22.20.5",
     "eslint": "^9.39.4",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^3.10.1",
@@ -46,9 +47,9 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.5.2",
     "prettier": "^3.8.3",
-    "ts-node": "^10.9.2",
     "tsup": "^8.5.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.73.0"
   },
   "peerDependencies": {
     "axios": "^1.17.0"
@@ -59,7 +60,6 @@
   },
   "dependencies": {
     "base-64": "^1.0.0",
-    "jwt-decode": "^4.0.0",
-    "typescript-eslint": "^8.60.1"
+    "jwt-decode": "^4.0.0"
   }
 }
