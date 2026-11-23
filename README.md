@@ -10,6 +10,8 @@ Wrapper utilities for interaction with REST APIs using [Axios](https://axios-htt
 npm i @ronas-it/axios-api-client
 ```
 
+The package requires `axios` `^1.20.0` (1.20.0 or later 1.x) as a peer dependency.
+
 2. Create API service instance:
 
 ```ts
@@ -29,9 +31,10 @@ import {
   tokenInterceptor,
   onResponseRefreshTokenInterceptor,
   onRequestRefreshTokenInterceptor,
+  unauthorizedInterceptor,
 } from '@ronas-it/axios-api-client';
 
-const configuration: AuthConfiguration = {
+const configuration: { apiURL: string; auth: AuthConfiguration } = {
   apiURL: 'https://api.your-app.dev',
   auth: {
     refreshTokenRoute: '/auth/refresh',
@@ -42,13 +45,15 @@ const configuration: AuthConfiguration = {
 
 const apiService = new ApiService(configuration.apiURL);
 
-const options: RefreshTokenOptions = {
+const options: RefreshTokenInterceptorOptions = {
   configuration: configuration.auth,
   getIsAuthenticated: () => {
     /* get isAuthenticated state here */
+    return false;
   },
   runTokenRefreshRequest: async () => {
-    const { token, ttl } = await apiService.get('/refresh');
+    // The refresh request must go to exactly `refreshTokenRoute`, otherwise protected requests hang forever.
+    const { token, ttl } = await apiService.get(configuration.auth.refreshTokenRoute);
     /* do something with token and ttl */
 
     return token;
@@ -58,20 +63,18 @@ const options: RefreshTokenOptions = {
 
 apiService.useInterceptors({
   request: [
+    [onRequestRefreshTokenInterceptor(options)],
     [
       tokenInterceptor({
         getToken: () => {
           /* get token here */
+          return '';
         },
       }),
     ],
   ],
-});
-
-apiService.useInterceptors({
-  request: [[onRequestRefreshToken(options)]],
   response: [
-    [null, onResponseRefreshToken(options)],
+    [null, onResponseRefreshTokenInterceptor(options)],
     [
       null,
       unauthorizedInterceptor({
