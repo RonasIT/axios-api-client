@@ -1,6 +1,5 @@
 import unusedImports from 'eslint-plugin-unused-imports';
-import _import from 'eslint-plugin-import';
-import { fixupPluginRules } from '@eslint/compat';
+import importX from 'eslint-plugin-import-x';
 import globals from 'globals';
 import tsParser from '@typescript-eslint/parser';
 import path from 'node:path';
@@ -29,7 +28,7 @@ export default [
     plugins: {
       '@typescript-eslint': tseslint.plugin,
       'unused-imports': unusedImports,
-      import: fixupPluginRules(_import),
+      'import-x': importX,
       '@stylistic': stylistic,
     },
 
@@ -52,11 +51,11 @@ export default [
     },
 
     settings: {
-      'import/parsers': {
+      'import-x/parsers': {
         '@typescript-eslint/parser': ['.ts', '.tsx'],
       },
 
-      'import/resolver': {
+      'import-x/resolver': {
         typescript: {
           alwaysTryTypes: true,
         },
@@ -72,7 +71,7 @@ export default [
         'warn',
         'single',
         {
-          allowTemplateLiterals: true,
+          allowTemplateLiterals: 'always',
         },
       ],
 
@@ -80,7 +79,7 @@ export default [
       '@stylistic/arrow-parens': ['warn', 'always'],
       'no-var': 'warn',
       'no-dupe-class-members': 'off',
-      'import/prefer-default-export': 'off',
+      'import-x/prefer-default-export': 'off',
       '@stylistic/implicit-arrow-linebreak': ['warn', 'beside'],
 
       '@stylistic/newline-per-chained-call': [
@@ -90,16 +89,7 @@ export default [
         },
       ],
 
-      '@stylistic/function-call-argument-newline': ['warn', 'consistent'],
-      '@stylistic/function-paren-newline': ['warn', 'consistent'],
-      '@stylistic/array-element-newline': ['warn', 'consistent'],
-
-      '@stylistic/array-bracket-newline': [
-        'warn',
-        {
-          multiline: true,
-        },
-      ],
+      '@stylistic/list-style': 'warn',
 
       '@stylistic/padding-line-between-statements': [
         'warn',
@@ -240,10 +230,10 @@ export default [
       ],
 
       '@stylistic/jsx-quotes': ['warn', 'prefer-single'],
-      'import/newline-after-import': 'warn',
-      'import/no-unresolved': 'warn',
+      'import-x/newline-after-import': 'warn',
+      'import-x/no-unresolved': 'warn',
 
-      'import/order': [
+      'import-x/order': [
         'warn',
         {
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object', 'type'],
@@ -254,7 +244,7 @@ export default [
         },
       ],
 
-      'import/no-duplicates': 'warn',
+      'import-x/no-duplicates': 'warn',
     },
   },
 ];
